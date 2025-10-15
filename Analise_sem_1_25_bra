@@ -1,1 +1,151 @@
-oi
+import matplotlib.pyplot as plt
+import pandas as pd
+import pyspark
+import seaborn as sns
+
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.functions import col, to_date, concat, lit, lpad
+from pyspark.sql.functions import col, sum as spark_sum, isnan
+from statsmodels.tsa.arima.model import ARIMA
+from sklearn.metrics import mean_squared_error
+
+
+pasta_novos = "/Volumes/workspace/default/tjsp_atualizado/extracao_TJSP_CN/*.csv"
+pasta_baixados = "/Volumes/workspace/default/tjsp_atualizado/extracao_TJSP_TBaix/*.csv"
+
+
+df_novos = spark.read.options(header=True, inferSchema=True, delimiter = ";").csv(pasta_novos)
+df_baixados = spark.read.options(header=True, inferSchema=True, delimiter = ";").csv(pasta_baixados)
+
+CNPJ_Banco = ["60746948000112"]
+AnoInicio = 2025
+AnoFim = 2025
+
+df_banco_novos = df_novos.filter(
+    (F.col('Polo passivo - CNPJ').like(f"%{CNPJ_Banco[0]}%")) &
+    (F.col('Ano') >= AnoInicio) &
+    (F.col('Ano') <= AnoFim) 
+)
+
+df_banco_baixados = df_baixados.filter(
+    (F.col('Polo passivo - CNPJ').like(f"%{CNPJ_Banco[0]}%")) &
+    (F.col('Ano') >= AnoInicio) &
+    (F.col('Ano') <= AnoFim) 
+)
+
+#Agrupando por Ano e Mês 
+df_banco_novos_agrupado = df_banco_novos.groupBy("Ano","Mes") \
+            .agg(F.count("*").alias("Processos Novos")) \
+            .orderBy("Ano","Mes")
+
+df_banco_baixados_agrupado = df_banco_baixados.groupBy("Ano","Mes") \
+            .agg(F.count("*").alias("Processos Baixados")) \
+            .orderBy("Ano","Mes")
+
+df_mesclado = df_banco_novos_agrupado.join(df_banco_baixados_agrupado, ["Ano","Mes"], how="left")
+
+display(df_mesclado.orderBy("Ano", "Mes"), truncate=False)
+
+df_corr = df_mesclado.select("Mes", "Processos Novos", "Processos Baixados").orderBy("Mes").toPandas()
+
+correlation_matrix = df_corr.corr(numeric_only=True)
+
+plt.figure(figsize=(6, 4))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title("Matriz de Correlação entre Processos Novos e Baixados")
+plt.show()
+
+plt.figure(figsize=(12, 6))
+plt.plot(df_corr["Mes"], df_corr["Processos Novos"], label="Processos Novos")
+plt.plot(df_corr["Mes"], df_corr["Processos Baixados"], label="Processos Baixados")
+plt.title("Comparação: Processos Novos vs. Processos Baixados")
+plt.xlabel("Data")
+plt.ylabel("Quantidade")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+from statsmodels.tsa.stattools import adfuller
+
+result = adfuller(df_corr["Processos Novos"])
+print("ADF Statistic:", result[0])
+print("p-value:", result[1])
+
+df = df_mesclado.toPandas()
+
+print("Dados nulos:")
+print(df.isnull().sum())
+
+df = df.dropna()  # Ou, por exemplo, df.fillna(0) para substituir nulos por 0
+
+print("\nDados após limpeza:")
+print(df.isnull().sum())
+
+
+print("Dados nulos por coluna:")
+null_counts = df_mesclado.select([
+    spark_sum(
+        (col(c).isNull() | isnan(col(c))).cast("int")
+    ).alias(c)
+    for c in df_mesclado.columns
+])
+display(null_counts)
+
+df_mesclado = df_mesclado.dropna()
+
+print("\nDados após limpeza:")
+null_counts_after = df_mesclado.select([
+    spark_sum(
+        (col(c).isNull() | isnan(col(c))).cast("int")
+    ).alias(c)
+    for c in df_mesclado.columns
+])
+display(null_counts_after)
+
+df_mesclado_data = df_mesclado.withColumn(
+    "Data",
+    to_date(
+        concat(
+            col("Ano").cast("string"),
+            lit("-"),
+            lpad(col("Mes").cast("string"), 2, "0"),  # Adiciona zero à esquerda se necessário
+            lit("-01")
+        ),
+        "yyyy-MM-dd"
+    )
+)
+
+display(df_mesclado_data)
+
+
+df_pandas = df_mesclado_data.select("Data", "Processos Novos").where("Mes < 7").orderBy("Data").toPandas()
+
+plt.figure(figsize=(12, 6))
+plt.plot(df_pandas["Data"], df_pandas["Processos Novos"], label="Processos Novos")
+plt.xlabel("Data")
+plt.ylabel("Processos Novos")
+plt.title("Evolução de Processos Novos ao Longo do Tempo")
+plt.legend()
+plt.show()
+
+modelo = ARIMA(df_pandas["Processos Novos"], order=(5, 1, 0))  # (p, d, q)
+modelo_fit = modelo.fit()
+
+forecast = modelo_fit.forecast(steps=6)  # Previsão para os próximos 12 meses
+
+plt.figure(figsize=(12, 6))
+plt.plot(df_pandas["Data"], df_pandas["Processos Novos"], label="Observado")
+plt.plot(pd.date_range(df_pandas["Data"].iloc[-1], periods=6, freq='M'), forecast, label="Previsto", linestyle='--')
+plt.xlabel("Data")
+plt.ylabel("Processos Novos")
+plt.title("Previsão de Processos Novos")
+plt.legend()
+plt.show()
+
+!pip install --upgrade threadpoolctl  
+!pip install --upgrade scikit-learn
+
+rmse = mean_squared_error(df_pandas["Processos Novos"][-6:], forecast, squared=False)
+print(f"RMSE: {rmse}")
