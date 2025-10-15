@@ -20,9 +20,9 @@
 
 
 ## Linguagens e Ferramentas
--Python
--Spark
--Databricks
+* Python
+* Spark
+* Databricks
 
 
 
