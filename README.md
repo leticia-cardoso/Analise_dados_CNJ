@@ -1,8 +1,13 @@
 # CASE - PROCESSOS JURÍDICOS BRADESCO
 
-## O projeto visa analisar o crescimento dos processos cíveis recebidos pelo banco Bradesco no primeiro semestre do ano de 2025 (janeiro a junho) e analisar: Fatores que possam ter influenciado esse resultado; Possíveis soluções e Análise Preditiva com modelos estatísticos  para prever a evolução dos casos nos próximos meses.
+## O projeto visa analisar o crescimento dos processos cíveis recebidos pelo banco Bradesco no primeiro semestre do ano de 2025 (janeiro a junho). 
 
-## ETAPAS
+## Objetivos
+* Analisar fatores que possam ter influenciado esse crescimento;
+* Sugerir possíveis soluções e
+* Realizar uma análise preditiva com modelos estatísticos para prever a evolução dos casos nos próximos meses.
+
+## Etapas
 1. Análise dos dados da base do CNJ
 2. Extração das bases necessárias
 3. Ingestão das bases no Databricks
