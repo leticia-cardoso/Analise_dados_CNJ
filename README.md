@@ -2,6 +2,8 @@
 
 ## O projeto visa analisar o crescimento dos processos cíveis recebidos pelo banco Bradesco no primeiro semestre do ano de 2025 (janeiro a junho). 
 
+
+
 ## Objetivos
 * Analisar fatores que possam ter influenciado esse crescimento;
 * Sugerir possíveis soluções e
