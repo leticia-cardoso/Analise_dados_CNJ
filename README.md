@@ -31,11 +31,29 @@
 
 <img width="1038" height="541" alt="image" src="https://github.com/user-attachments/assets/c9ebcd53-2f22-4e2e-b77d-673b53fc07af" />
 
-## MODELAGEM - MODELO ARIMA
+## MODELAGEM - MODELO ARIMA + RMSE
 
 <img width="1028" height="548" alt="image" src="https://github.com/user-attachments/assets/a19e2dcf-5fd5-4b53-be1a-46b4f6d48e20" />
 
 <img width="270" height="34" alt="image" src="https://github.com/user-attachments/assets/20554067-001d-46c2-b295-a6ec98c347ba" />
+
+## POSSÍVEIS CAUSAS
+* Mudanças da base de clientes
+* Qualidade do atendimento (automatização com bots)
+* Produtos novos e antigos
+* Análise de concentração em regiões ou perfis específicos
+
+## SOLUÇÕES
+* Ações preventivas para redução de novos casos: 
+* Atuação com time CX e SAC
+* Análise dos indicadores: dúvida, reclamação, satisfação
+* verificação da clientes que abrem processo com tentativa de solução do problema> Reeducação
+
+PRÓXIMOS PASSOS
+* Expandir a análise com mais variáveis (canal, perfil de cliente).
+* Construir modelos explicativos como regressão multivariada.
+* Implementar previsões operacionais no Databricks em tempo real.
+* Apresentar os resultados para as áreas jurídica, de produtos e atendimento aocliente.
 
 
 
