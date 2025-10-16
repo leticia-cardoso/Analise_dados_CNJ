@@ -45,15 +45,14 @@
 
 ## SOLUÇÕES
 * Ações preventivas para redução de novos casos: 
-* Atuação com time CX e SAC
-* Análise dos indicadores: dúvida, reclamação, satisfação
-* verificação da clientes que abrem processo com tentativa de solução do problema> Reeducação
+* Atuação com time CX e SAC > Análise de indicadores: dúvida, reclamação, satisfação
+* verificação da clientes que abrem processo com tentativa de solução do problema (Reeducação)
 
 PRÓXIMOS PASSOS
 * Expandir a análise com mais variáveis (canal, perfil de cliente).
 * Construir modelos explicativos como regressão multivariada.
 * Implementar previsões operacionais no Databricks em tempo real.
-* Apresentar os resultados para as áreas jurídica, de produtos e atendimento aocliente.
+* Apresentar os resultados para as áreas jurídica, de produtos e atendimento ao cliente.
 
 
 
