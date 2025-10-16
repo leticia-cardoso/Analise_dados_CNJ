@@ -25,12 +25,13 @@
 * Databricks
 
 
-## MODELAGEM
+## ANÁLISE EXPLORATÓRIA
 
 <img width="589" height="295" alt="image" src="https://github.com/user-attachments/assets/f568fac8-b994-48d2-8507-e2f5ad1c7cf3" />
 
-
 <img width="1038" height="541" alt="image" src="https://github.com/user-attachments/assets/c9ebcd53-2f22-4e2e-b77d-673b53fc07af" />
+
+## MODELAGEM - MODELO ARIMA
 
 <img width="1028" height="548" alt="image" src="https://github.com/user-attachments/assets/a19e2dcf-5fd5-4b53-be1a-46b4f6d48e20" />
 
