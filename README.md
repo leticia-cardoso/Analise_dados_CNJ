@@ -42,6 +42,7 @@
 * Qualidade do atendimento (automatização com bots)
 * Produtos novos e antigos
 * Análise de concentração em regiões ou perfis específicos
+* Suporte ao cliente com problemas ou auxílio com novos produtos
 
 ## SOLUÇÕES
 * Ações preventivas para redução de novos casos: 
