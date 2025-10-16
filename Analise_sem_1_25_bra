@@ -33,40 +33,6 @@ df_banco_baixados = df_baixados.filter(
     (F.col('Ano') >= AnoInicio) &
     (F.col('Ano') <= AnoFim) 
 )
-
-#Agrupando por Ano e Mês 
-df_banco_novos_agrupado = df_banco_novos.groupBy("Ano","Mes") \
-            .agg(F.count("*").alias("Processos Novos")) \
-            .orderBy("Ano","Mes")
-
-df_banco_baixados_agrupado = df_banco_baixados.groupBy("Ano","Mes") \
-            .agg(F.count("*").alias("Processos Baixados")) \
-            .orderBy("Ano","Mes")
-
-df_mesclado = df_banco_novos_agrupado.join(df_banco_baixados_agrupado, ["Ano","Mes"], how="left")
-
-display(df_mesclado.orderBy("Ano", "Mes"), truncate=False)
-
-df_corr = df_mesclado.select("Mes", "Processos Novos", "Processos Baixados").orderBy("Mes").toPandas()
-
-correlation_matrix = df_corr.corr(numeric_only=True)
-
-plt.figure(figsize=(6, 4))
-sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
-plt.title("Matriz de Correlação entre Processos Novos e Baixados")
-plt.show()
-
-plt.figure(figsize=(12, 6))
-plt.plot(df_corr["Mes"], df_corr["Processos Novos"], label="Processos Novos")
-plt.plot(df_corr["Mes"], df_corr["Processos Baixados"], label="Processos Baixados")
-plt.title("Comparação: Processos Novos vs. Processos Baixados")
-plt.xlabel("Data")
-plt.ylabel("Quantidade")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-
 from statsmodels.tsa.stattools import adfuller
 
 result = adfuller(df_corr["Processos Novos"])
@@ -104,6 +70,39 @@ null_counts_after = df_mesclado.select([
 ])
 display(null_counts_after)
 
+#Agrupando por Ano e Mês 
+df_banco_novos_agrupado = df_banco_novos.groupBy("Ano","Mes") \
+            .agg(F.count("*").alias("Processos Novos")) \
+            .orderBy("Ano","Mes")
+
+df_banco_baixados_agrupado = df_banco_baixados.groupBy("Ano","Mes") \
+            .agg(F.count("*").alias("Processos Baixados")) \
+            .orderBy("Ano","Mes")
+
+df_mesclado = df_banco_novos_agrupado.join(df_banco_baixados_agrupado, ["Ano","Mes"], how="left")
+
+display(df_mesclado.orderBy("Ano", "Mes"), truncate=False)
+
+df_corr = df_mesclado.select("Mes", "Processos Novos", "Processos Baixados").orderBy("Mes").toPandas()
+
+correlation_matrix = df_corr.corr(numeric_only=True)
+
+plt.figure(figsize=(6, 4))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title("Matriz de Correlação entre Processos Novos e Baixados")
+plt.show()
+
+plt.figure(figsize=(12, 6))
+plt.plot(df_corr["Mes"], df_corr["Processos Novos"], label="Processos Novos")
+plt.plot(df_corr["Mes"], df_corr["Processos Baixados"], label="Processos Baixados")
+plt.title("Comparação: Processos Novos vs. Processos Baixados")
+plt.xlabel("Data")
+plt.ylabel("Quantidade")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
 df_mesclado_data = df_mesclado.withColumn(
     "Data",
     to_date(
@@ -130,7 +129,7 @@ plt.title("Evolução de Processos Novos ao Longo do Tempo")
 plt.legend()
 plt.show()
 
-modelo = ARIMA(df_pandas["Processos Novos"], order=(5, 1, 0))  # (p, d, q)
+modelo = ARIMA(df_pandas["Processos Novos"], order=(5, 1, 0)) 
 modelo_fit = modelo.fit()
 
 forecast = modelo_fit.forecast(steps=6)  # Previsão para os próximos 12 meses
